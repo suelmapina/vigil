@@ -1,0 +1,16 @@
+{
+  "rows": 1000000,
+  "fraud_rate": 0.011029,
+  "fraud_rate_fit": 0.009975342846909568,
+  "fraud_rate_test": 0.014038271117159567,
+  "features_psi_over_0.1_in_test": 8,
+  "features_psi_over_0.25_in_test": 6,
+  "top_shift_in_test": {
+    "velocity_4w": 3.98,
+    "velocity_24h": 2.624,
+    "velocity_6h": 1.433,
+    "zip_count_4w": 0.864,
+    "date_of_birth_distinct_emails_4w": 0.505,
+    "credit_risk_score": 0.293
+  }
+}

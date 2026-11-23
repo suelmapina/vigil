@@ -19,5 +19,15 @@ baseparquet = processeddir / "baf_base.parquet"
 
 target = "fraud_bool"
 monthcol = "month"
-trainmonths = range(0, 6)  # first six months, as in the paper
-testmonths = range(6, 8)  # last two months are never seen in training
+
+# temporal split, as in production: fit on the oldest months, tune on the most recent one,
+# report on months the model has never seen (same 6 + 2 split as the paper)
+fitmonths = range(0, 5)
+validmonth = 5
+testmonths = range(6, 8)
+trainmonths = range(0, 6)  # fit + valid
+
+agegroup = 50  # fairness groups: applicants under / over 50, as in the paper
+targetfpr = 0.05  # the paper's operating point: recall at 5% false positive rate
+
+mlflowuri = f"sqlite:///{root / 'mlflow.db'}"

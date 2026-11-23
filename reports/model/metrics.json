@@ -1,0 +1,136 @@
+{
+  "fit_rows": 675666,
+  "valid_rows": 119323,
+  "test_rows": 205011,
+  "test_fraud_rate": 0.014038271117159567,
+  "unstable_features": [
+    "velocity_6h",
+    "velocity_24h",
+    "velocity_4w"
+  ],
+  "best_model": "lightgbm_stable",
+  "models": {
+    "rules": {
+      "pr_auc": 0.04450963628232275,
+      "roc_auc": 0.7430414815361784,
+      "recall_at_5fpr": 0.21403752605976373,
+      "fpr_ratio_age": 0.903356579419873,
+      "recall_fixed_threshold": 0.21820708825573315,
+      "fpr_fixed_threshold": 0.052386300109333955,
+      "fpr_fixed_month6": 0.05521092974006259,
+      "fpr_fixed_month7": 0.04922706073468532,
+      "fit_seconds": 0.0
+    },
+    "logistic": {
+      "pr_auc": 0.16294736491516298,
+      "roc_auc": 0.8819569950137103,
+      "recall_at_5fpr": 0.5034746351633078,
+      "fpr_ratio_age": 0.2948928531993705,
+      "recall_fixed_threshold": 0.4982626824183461,
+      "fpr_fixed_threshold": 0.04829988176101874,
+      "fpr_fixed_month6": 0.05830319158904777,
+      "fpr_fixed_month7": 0.03711156526751559,
+      "fit_seconds": 10.6
+    },
+    "lightgbm": {
+      "pr_auc": 0.1973502527060309,
+      "roc_auc": 0.894605245962168,
+      "recall_at_5fpr": 0.5496872828353023,
+      "fpr_ratio_age": 0.3034547337408098,
+      "recall_fixed_threshold": 0.5830437804030577,
+      "fpr_fixed_threshold": 0.0599407320922363,
+      "fpr_fixed_month6": 0.06578084296932102,
+      "fpr_fixed_month7": 0.05340879316669287,
+      "fit_seconds": 48.9
+    },
+    "lightgbm_stable": {
+      "pr_auc": 0.1967114393460251,
+      "roc_auc": 0.8943968500198338,
+      "recall_at_5fpr": 0.5496872828353023,
+      "fpr_ratio_age": 0.29599285614804866,
+      "recall_fixed_threshold": 0.5601111883252259,
+      "fpr_fixed_threshold": 0.05298986310993257,
+      "fpr_fixed_month6": 0.0600554733034727,
+      "fpr_fixed_month7": 0.045087250432321965,
+      "fit_seconds": 76.9
+    }
+  },
+  "bootstrap_vs_logistic": {
+    "rules": {
+      "recall_at_5fpr": {
+        "low": 0.1982580299012878,
+        "high": 0.22845294432124186,
+        "diff": -0.290746895299348,
+        "diff_low": -0.3106838975593343,
+        "diff_high": -0.27005785766797274
+      },
+      "pr_auc": {
+        "low": 0.041369941273318764,
+        "high": 0.048736284417558964,
+        "diff": -0.11900993394149874,
+        "diff_low": -0.1288686078698979,
+        "diff_high": -0.10821733084378385
+      }
+    },
+    "logistic": {
+      "recall_at_5fpr": {
+        "low": 0.48660048982725007,
+        "high": 0.5215581897609283,
+        "diff": 0.0,
+        "diff_low": 0.0,
+        "diff_high": 0.0
+      },
+      "pr_auc": {
+        "low": 0.151229693774956,
+        "high": 0.17662886260889138,
+        "diff": 0.0,
+        "diff_low": 0.0,
+        "diff_high": 0.0
+      }
+    },
+    "lightgbm": {
+      "recall_at_5fpr": {
+        "low": 0.5321340680081279,
+        "high": 0.5684084368650861,
+        "diff": 0.045993747864610725,
+        "diff_low": 0.03156344523460898,
+        "diff_high": 0.05916674772810201
+      },
+      "pr_auc": {
+        "low": 0.1827992043914198,
+        "high": 0.21325085375281705,
+        "diff": 0.03428944543881463,
+        "diff_low": 0.02622248718917817,
+        "diff_high": 0.0422219234302378
+      }
+    },
+    "lightgbm_stable": {
+      "recall_at_5fpr": {
+        "low": 0.5292714093373649,
+        "high": 0.5684427628305312,
+        "diff": 0.0453762690054921,
+        "diff_low": 0.03123208728853211,
+        "diff_high": 0.05947672154231018
+      },
+      "pr_auc": {
+        "low": 0.1823780083662271,
+        "high": 0.21342982150066414,
+        "diff": 0.033595837868183195,
+        "diff_low": 0.025597957701363055,
+        "diff_high": 0.040197903679165946
+      }
+    }
+  },
+  "calibration": {
+    "raw": {
+      "brier": 0.012457227337211638,
+      "mean_predicted": 0.00958884870509702,
+      "observed_rate": 0.014038271117159567
+    },
+    "isotonic": {
+      "brier": 0.012391190048614293,
+      "mean_predicted": 0.012426273954743475,
+      "observed_rate": 0.014038271117159567
+    }
+  }
+}

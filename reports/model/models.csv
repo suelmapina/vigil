@@ -1,0 +1,5 @@
+,pr_auc,roc_auc,recall_at_5fpr,fpr_ratio_age,recall_fixed_threshold,fpr_fixed_threshold,fpr_fixed_month6,fpr_fixed_month7,fit_seconds
+rules,0.0445,0.743,0.214,0.9034,0.2182,0.0524,0.0552,0.0492,0.0
+logistic,0.1629,0.882,0.5035,0.2949,0.4983,0.0483,0.0583,0.0371,10.6
+lightgbm,0.1974,0.8946,0.5497,0.3035,0.583,0.0599,0.0658,0.0534,48.9
+lightgbm_stable,0.1967,0.8944,0.5497,0.296,0.5601,0.053,0.0601,0.0451,76.9
