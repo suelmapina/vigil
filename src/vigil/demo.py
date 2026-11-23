@@ -46,7 +46,8 @@ st.markdown(
   margin: 0 0.3rem 0.3rem 0; border-radius: 6px; border: 1px solid {theme.border};
   color: {theme.light}; }}
 .chip.alert {{ border-color: rgba(140, 71, 209, 0.6); background: rgba(140, 71, 209, 0.14); }}
-.assumptions {{ color: {theme.mutedforeground}; font-size: 0.9rem; }}
+.assumptions {{ font-family: '{theme.mono}', monospace; font-size: 0.68rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: {theme.mutedforeground}; margin-bottom: 0.2rem; }}
 .stTabs [data-baseweb="tab-highlight"] {{ height: 2px; }}
 .report {{ display: grid; grid-template-columns: 0.8fr 3.2fr repeat(5, 1fr);
   gap: 0.55rem 1.2rem; align-items: center; color: {theme.light}; font-size: 0.92rem; }}
@@ -208,32 +209,26 @@ html(
 )
 st.write("")
 
-bar = st.columns([4, 1], vertical_alignment="center")
-with bar[1].popover("Adjust assumptions", icon=":material/tune:", width="stretch"):
-    lost = st.select_slider(
-        "Value of a good customer turned away (€)",
-        [25, 50, 100, 200, 400],
-        value=100,
-        help="Lifetime margin lost when a legitimate applicant is declined.",
-    )
-    reviewcost = st.slider("Analyst cost per review (€)", 5, 50, 20, 5)
-    capacity = (
-        st.select_slider(
-            "Analyst capacity, share of applications",
-            [0.5, 1.0, 2.5, 5.0, 10.0],
-            value=2.5,
-            format_func=lambda v: f"{v:g}%",
-            help="How many applications the fraud team can review. Every policy gets the same.",
-        )
-        / 100
-    )
-costs = {"lostcustomer": float(lost), "reviewcost": float(reviewcost)}
-bar[0].markdown(
-    '<div class="assumptions">Two months the model never saw · 205,011 applications · '
-    f"good customer worth €{lost} · €{reviewcost} per review · analysts review "
-    f"{capacity:.1%}</div>".replace(".0%", "%"),
-    unsafe_allow_html=True,
+html('<div class="assumptions">Assumptions · change them and every number below updates</div>')
+c1, c2, c3 = st.columns(3, gap="large")
+lost = c1.select_slider(
+    "Value of a good customer turned away (€)",
+    [25, 50, 100, 200, 400],
+    value=100,
+    help="Lifetime margin lost when a legitimate applicant is declined.",
 )
+reviewcost = c2.slider("Analyst cost per review (€)", 5, 50, 20, 5)
+capacity = (
+    c3.select_slider(
+        "Analysts can review",
+        [0.5, 1.0, 2.5, 5.0, 10.0],
+        value=2.5,
+        format_func=lambda v: f"{v:g}% of applications",
+        help="How many applications the fraud team can review. Every policy gets the same.",
+    )
+    / 100
+)
+costs = {"lostcustomer": float(lost), "reviewcost": float(reviewcost)}
 
 with st.spinner("Scoring 205,011 applications under every policy…"):
     table = comparison(float(lost), float(reviewcost), capacity)
