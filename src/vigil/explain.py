@@ -18,7 +18,6 @@ import pandas as pd
 from vigil import config
 from vigil.data import prepare
 from vigil.decision import engine
-from vigil.model.train import modelpath, scorespath
 
 labels = {
     "income": "Income decile",
@@ -54,7 +53,7 @@ labels = {
 
 
 def load():
-    return joblib.load(modelpath)
+    return joblib.load(config.modelpath)
 
 
 def contributions(bundle: dict, x: pd.DataFrame) -> pd.DataFrame:
@@ -96,7 +95,7 @@ def main(sample: int = 20000) -> None:
     bundle = load()
     df = prepare.load()
     test = prepare.split(df)[2].reset_index(drop=True)
-    scored = pd.read_parquet(scorespath)
+    scored = pd.read_parquet(config.scorespath)
 
     rows = test.sample(sample, random_state=config.seed)
     shap = contributions(bundle, rows)

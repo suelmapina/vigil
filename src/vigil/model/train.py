@@ -28,9 +28,9 @@ from vigil import config, drift
 from vigil.data import prepare
 from vigil.model import metrics
 
-scorespath = config.processeddir / "test_scores.parquet"
-validpath = config.processeddir / "valid_scores.parquet"
-modelpath = config.modelsdir / "model.joblib"
+scorespath = config.scorespath
+validpath = config.validpath
+modelpath = config.modelpath
 unstablepsi = 0.25
 
 treeparams = dict(

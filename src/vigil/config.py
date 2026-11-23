@@ -1,5 +1,6 @@
 """Project-wide paths and constants."""
 
+import os
 from pathlib import Path
 
 root = Path(__file__).resolve().parents[2]
@@ -31,3 +32,8 @@ agegroup = 50  # fairness groups: applicants under / over 50, as in the paper
 targetfpr = 0.05  # the paper's operating point: recall at 5% false positive rate
 
 mlflowuri = f"sqlite:///{root / 'mlflow.db'}"
+
+# artefacts shared by the pipeline, the API and the demo
+modelpath = Path(os.environ.get("VIGIL_MODEL", modelsdir / "model.joblib"))
+scorespath = processeddir / "test_scores.parquet"
+validpath = processeddir / "valid_scores.parquet"

@@ -1,4 +1,4 @@
-.PHONY: help install data drift model decision explain fairness monitor all lint format test mlflow clean
+.PHONY: help install data drift model decision explain fairness monitor all api loadtest docker lint format test mlflow clean
 
 help:  ## Show available commands
 	@grep -E "^[a-zA-Z_-]+:.*?## " $(MAKEFILE_LIST) | awk "BEGIN {FS = \":.*?## \"}; {printf \"  \033[36m%-14s\033[0m %s\n\", \$$1, \$$2}"
@@ -28,6 +28,16 @@ monitor:  ## Monthly monitoring report, retraining backtest and shadow test (~9 
 	uv run python -m vigil.monitor
 
 all: drift model decision explain fairness monitor  ## Run the full pipeline
+
+api:  ## Serve the scoring API on http://localhost:8000/docs
+	uv run uvicorn vigil.api.main:app --port 8000
+
+loadtest:  ## Latency under load (start make api in another terminal first)
+	uv run python -m vigil.api.loadtest --requests 2000 --concurrency 1
+	uv run python -m vigil.api.loadtest --requests 3000 --concurrency 8
+
+docker:  ## Build the API image (after make model)
+	docker build -t vigil-api .
 
 lint:  ## Lint with ruff
 	uv run ruff check src tests

@@ -1,0 +1,10 @@
+{
+  "requests": 2000,
+  "concurrency": 1,
+  "server_p50_ms": 1.78,
+  "server_p95_ms": 7.43,
+  "server_p99_ms": 17.05,
+  "end_to_end_p50_ms": 4.76,
+  "end_to_end_p95_ms": 12.19,
+  "end_to_end_p99_ms": 23.28
+}

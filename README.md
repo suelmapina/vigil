@@ -1,7 +1,7 @@
 # 🛡️ Vigil: Cost-Aware Fraud Screening for Account Opening
 
 > **Work in progress.** Done so far: data, drift analysis, model comparison, cost-based decisions,
-> reason codes, fairness and monitoring. Next: API and demo.
+> reason codes, fairness, monitoring and the scoring API. Next: demo.
 
 ## The business problem
 
@@ -205,6 +205,53 @@ The challenger costs €1.5k more (95 % CI −€12k to +€16k): no measurable 
 promoted**. It is fairer, which is worth recording: if the team values that, the promotion rule
 should say so explicitly rather than be bent case by case.
 
+## 6. Serving
+
+`POST /score` takes one application and returns the action, the calibrated fraud probability, the
+expected cost of each action, and the reasons:
+
+```json
+{
+  "action": "review",
+  "probability": 0.0461,
+  "expectedcost": {"approve": 46.12, "review": 26.52, "decline": 95.39},
+  "reviewsaving": 19.6,
+  "reasons": [
+    {"text": "Housing status: BA", "impact": 1.022},
+    {"text": "Name and email similarity: 0.12", "impact": 0.579},
+    {"text": "Income decile: 9 of 10", "impact": 0.414}
+  ],
+  "model": "lightgbm_stable"
+}
+```
+
+- **Analyst capacity lives in the queue, not in the API.** One request cannot know how busy the
+  analysts are, so every response carries `reviewsaving`: what a review is expected to save over
+  the next best action. Sorting the review queue by it is exactly how the batch engine fills
+  limited capacity.
+- **No training/serving skew.** The API does its own lean preprocessing (no pandas on the hot
+  path), and a test checks that its probabilities match the offline pipeline used for every
+  number in this README.
+- **Reasons where someone acts on them.** TreeSHAP costs about 40 times more than the score itself,
+  so it runs for reviews and declines (about 3 % of traffic), and on request with `?explain=true`.
+- **Age is ignored** even if it is sent, and invalid inputs are rejected with a 422.
+
+**Latency** (one uvicorn worker on a laptop, real applications from the test months, server time
+from an `x-process-ms` header):
+
+| Load | Server p50 | Server p99 | End to end p99 | Throughput |
+|---|---|---|---|---|
+| 1 request at a time | 1.8 ms | 17 ms | 23 ms | 160 per second |
+| 8 concurrent | 1.4 ms | 8 ms | 48 ms | 436 per second |
+
+End to end includes the Python load generator running on the same machine. The first version took
+44 ms per request: pandas conversions and computing reasons for every approval. Profiling and
+removing both made it about 25 times faster.
+
+**Docker.** `make docker` builds a slim image with the serving dependencies only
+(`requirements-api.txt`, pinned to `uv.lock`; no MLflow or Streamlit), running as a non-root user
+with a health check.
+
 ## Quickstart
 
 ```bash
@@ -212,6 +259,7 @@ make install       # uv sync, Python 3.11
 make data          # BAF base from Kaggle (needs a Kaggle API token in ~/.kaggle)
 make all           # drift, models, decisions, reasons, fairness, monitoring (~16 min)
 make test          # unit tests
+make api           # scoring API on http://localhost:8000/docs
 make mlflow        # experiment tracking UI
 ```
 
