@@ -1,7 +1,7 @@
 option,group,good_stopped,good_declined,fraud_stopped
-Vigil,under50,0.0183,0.0027,0.2864
-Vigil,over50,0.0688,0.0123,0.5086
-Without the age feature,under50,0.0203,0.0031,0.3055
-Without the age feature,over50,0.0605,0.0113,0.4681
-Equal burden across age groups,under50,0.0235,0.0026,0.333
-Equal burden across age groups,over50,0.0264,0.0002,0.3185
+With the age feature,under50,0.0189,0.0032,0.2901
+With the age feature,over50,0.0719,0.0147,0.5046
+Vigil,under50,0.0203,0.0031,0.3055
+Vigil,over50,0.0605,0.0113,0.4681
+Equal burden across age groups,under50,0.023,0.0029,0.3325
+Equal burden across age groups,over50,0.031,0.0006,0.3397

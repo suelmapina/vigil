@@ -1,7 +1,7 @@
 # 🛡️ Vigil: Cost-Aware Fraud Screening for Account Opening
 
-> **Work in progress.** Done so far: data, drift analysis, model comparison and cost-based
-> decisions. Next: explanations and fairness, monitoring, API and demo.
+> **Work in progress.** Done so far: data, drift analysis, model comparison, cost-based decisions,
+> reason codes and fairness. Next: monitoring, API and demo.
 
 ## The business problem
 
@@ -22,7 +22,8 @@ calibration, thresholds), report on months 6 and 7, which no model or decision h
 
 **Cleaning.** Some columns use −1 for "missing". Missingness is a signal (no previous address on
 file: 1.42 % fraud vs 0.31 %), so these become explicit missing values rather than a small number.
-One column is constant and is dropped.
+One column is constant and is dropped. **Age is kept to measure fairness but is never used to
+score** (section 4 explains why).
 
 ## 1. The data moves
 
@@ -46,12 +47,12 @@ applicants are flagged.
 | Model | Fraud caught at 5 % FPR | PR-AUC | ROC-AUC | Fit time |
 |---|---|---|---|---|
 | Rules engine (7 red flags) | 21.4 % | 0.04 | 0.74 | |
-| Logistic regression | 50.3 % | 0.16 | 0.88 | 11 s |
-| LightGBM, all features | 55.0 % | 0.20 | 0.89 | 49 s |
-| **LightGBM, stable features** | **55.0 %** | **0.20** | **0.89** | 77 s |
+| Logistic regression | 50.1 % | 0.16 | 0.88 | 12 s |
+| LightGBM, all features | 54.3 % | 0.19 | 0.89 | 47 s |
+| **LightGBM, stable features** | **54.4 %** | **0.19** | **0.89** | 62 s |
 
-95 % intervals from 200 paired bootstrap resamples: LightGBM catches **+4.5 pp** more fraud than
-logistic regression (+3.1 to +5.9) and more than twice as much as the rules engine.
+95 % intervals from 200 paired bootstrap resamples: LightGBM catches **+4.4 pp** more fraud than
+logistic regression (+2.9 to +5.8) and more than twice as much as the rules engine.
 
 **Why ship the model without the drifting features.** Both LightGBM versions rank applications
 equally well. The difference shows up when the threshold is set on month 5 and left alone, as it
@@ -60,21 +61,16 @@ would be in production:
 | Threshold fixed on month 5 | FPR, month 6 | FPR, month 7 | FPR, both | Fraud caught |
 |---|---|---|---|---|
 | Target | 5.0 % | 5.0 % | 5.0 % | |
-| LightGBM, all features | 6.6 % | 5.3 % | 6.0 % | 58.3 % |
-| **LightGBM, stable features** | **6.0 %** | **4.5 %** | **5.3 %** | 56.0 % |
+| LightGBM, all features | 6.6 % | 5.6 % | 6.1 % | 58.7 % |
+| **LightGBM, stable features** | **6.1 %** | **4.7 %** | **5.4 %** | 56.5 % |
 
-With all features, 20 % more legitimate customers are flagged than planned. Dropping the three
+With all features, 23 % more legitimate customers are flagged than planned. Dropping the three
 velocity features keeps the error closer to budget at no cost in ranking quality. It does not
 remove the shift, which is why monitoring and threshold review are part of the design.
 
-**Calibration.** Raw scores predict 0.96 % fraud in the test months; the true rate is 1.40 %.
-Isotonic calibration on month 5 brings this to 1.24 %. It cannot fully catch up, because fraud
-keeps rising after month 5. This matters for the cost-based decisions in the next step.
-
-**Fairness is the open problem.** At 5 % FPR, applicants aged 50 or more are flagged about
-**3.4 times** as often as younger legitimate applicants (FPR ratio 0.30; 1 means equal). The rules
-engine is much fairer (0.90) but catches less than half as much fraud. This trade-off gets its
-own analysis.
+**Calibration.** Raw scores predict 0.99 % fraud in the test months; the true rate is 1.40 %.
+Isotonic calibration on month 5 brings this to 1.27 %. It cannot fully catch up, because fraud
+keeps rising after month 5.
 
 ## 3. From scores to decisions, in euros
 
@@ -96,35 +92,71 @@ every policy):
 
 | Policy | Total cost | Fraud stopped | Good customers declined | Extra cost vs Vigil (95 % CI) |
 |---|---|---|---|---|
-| Approve everyone | €2.32M | 0 % | 0 | +€1.12M (1.04 to 1.20) |
-| Rules: analysts review the top alerts | €2.15M | 12 % | 0 | +€958k (879k to 1.04M) |
-| Model: analysts review the top scores | €1.39M | 34 % | 0 | +€196k (159k to 233k) |
-| Model: decline everything above 5 % FPR | €1.82M | 56 % | 10,711 | +€629k (605k to 654k) |
-| **Vigil: cost-based decision** | **€1.20M** | 34 % | 851 | |
+| Approve everyone | €2.32M | 0 % | 0 | +€1.13M (1.04M to 1.22M) |
+| Rules: analysts review the top alerts | €2.15M | 12 % | 0 | +€963k (887k to 1.05M) |
+| Model: analysts review the top scores | €1.42M | 33 % | 0 | +€229k (193k to 269k) |
+| Model: decline everything above 5 % FPR | €1.83M | 57 % | 10,940 | +€638k (612k to 663k) |
+| **Vigil: cost-based decision** | **€1.19M** | 34 % | 896 | |
 
 95 % intervals from 200 paired bootstrap resamples.
 
-- **Against the rules setup, Vigil cuts the cost of fraud and screening by 44 %** (€958k over two
+- **Against the rules setup, Vigil cuts the cost of fraud and screening by 45 %** (€963k over two
   months) with the same analyst team.
-- **Most of the gain comes from the model; the last €196k from the decision rule.** Same model,
+- **Most of the gain comes from the model; the last €229k from the decision rule.** Same model,
   same analysts: using expected cost instead of the raw score ranking sends analysts to the
   applications where a mistake would be most expensive, and declines the clearest cases outright.
-- **The 5 % FPR rule stops the most fraud and is still €629k more expensive**, because it turns away
-  10,711 legitimate applicants. A benchmark operating point is not a business one.
+- **The 5 % FPR rule stops the most fraud and is still €638k more expensive**, because it turns away
+  10,940 legitimate applicants. A benchmark operating point is not a business one.
 - **Exposure drives the decision.** Applications asking for a €1,500 to €2,100 credit line are
-  reviewed 15 % of the time and declined 5.5 %; those asking for €200 are approved 99.8 % of the
+  reviewed 16 % of the time and declined 5 %; those asking for €200 are approved 99.9 % of the
   time. A €2,000 line is worth checking at a fraud risk that a €200 line is not.
 - **Vigil is the cheapest policy in all 25 scenarios tested** (value of a good customer from €25 to
   €400, analyst capacity from 0.5 % to 10 %).
-- **Calibration barely changes the result here** (+€6k without it, within noise), because the
+- **Calibration barely changes the result here** (+€10k without it, −2k to +21k), because the
   decisions depend mostly on the ranking and the credit limit.
+
+## 4. Reasons and fairness
+
+**Every review comes with its reasons.** The three features that pushed an application towards
+fraud, in plain words, from exact TreeSHAP values computed by LightGBM itself. A real example from
+the test months:
+
+> Fraud probability 13 %, credit limit €500 → **review** (it was fraud)
+> 1. Housing status: BA
+> 2. Name and email similarity: 0.20
+> 3. Request from abroad: 1
+
+Categories are anonymised in the dataset (BA, CA and so on); in a bank they would be readable.
+
+**Who carries the false alarms.** Fraud is 2.7 times more common among applicants aged 50 or more
+(2.9 % vs 1.1 %). A model that gets the risk right for both groups will therefore stop more of
+their legitimate applicants too: equal error rates and equal calibration cannot both hold when base
+rates differ. Any fix is a choice, so each option is priced:
+
+| Option | Good applicants stopped, under 50 / 50+ | Balance (1 = equal) | Fraud stopped | Cost vs Vigil (95 % CI) |
+|---|---|---|---|---|
+| Age used as a model input | 1.9 % / 7.2 % | 0.26 | 34.4 % | −€7k (−29k to +12k) |
+| **Vigil: age never used to score** | 2.0 % / 6.1 % | 0.34 | 34.1 % | |
+| Equal burden: lower the risk of the 50+ group | 2.3 % / 3.1 % | 0.74 | 31.0 % | +€63k (43k to 86k) |
+
+"Stopped" means reviewed or declined.
+
+- **Dropping age costs nothing and reduces the gap**, so Vigil ships without it. At the paper's
+  5 % FPR operating point the ratio improves from 0.30 to 0.40. It does not close the gap, because
+  other features carry part of the age signal.
+- **Closing most of the gap costs about €63k over two months (+5 %)** and stops less fraud among
+  older applicants (47 % to 34 %). It also means using age *in the decision*, which is
+  differential treatment. Whether that trade is acceptable is a decision for legal and compliance,
+  not for the model; the analysis gives them the price.
+- **Fairness also drifts.** The equal burden adjustment was set to balance month 5 exactly; on the
+  test months the balance is 0.74, not 1. Group error rates need monitoring like any other metric.
 
 ## Quickstart
 
 ```bash
 make install       # uv sync, Python 3.11
 make data          # BAF base from Kaggle (needs a Kaggle API token in ~/.kaggle)
-make all           # drift report, model comparison and decision simulation (~5 min)
+make all           # drift, models, decisions, reasons and fairness (~7 min)
 make test          # unit tests
 make mlflow        # experiment tracking UI
 ```

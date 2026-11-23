@@ -22,6 +22,9 @@ missingcodes = [
 constant = ["device_fraud_count"]  # always 0 in the base dataset
 categorical = ["payment_type", "employment_status", "housing_status", "source", "device_os"]
 protected = ["customer_age", "income", "employment_status"]
+# age is kept in the data to measure fairness, never used to score: dropping it costs nothing
+# (see vigil.fairness) and avoids treating applicants differently because of their age
+notfeatures = [config.target, config.monthcol, "customer_age"]
 
 
 def clean(df: pd.DataFrame) -> pd.DataFrame:
@@ -38,7 +41,7 @@ def load() -> pd.DataFrame:
 
 
 def features(df: pd.DataFrame) -> list[str]:
-    return [c for c in df.columns if c not in (config.target, config.monthcol)]
+    return [c for c in df.columns if c not in notfeatures]
 
 
 def split(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:

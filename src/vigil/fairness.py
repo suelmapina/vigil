@@ -5,8 +5,8 @@ calibrated for both groups will also flag more of their legitimate applicants. E
 and equal calibration cannot both hold when base rates differ, so any fix is a choice. This script
 prices three options on the unseen test months:
 
-1. Vigil as it is.
-2. Without the age feature ("fairness through unawareness"): retrain without customer_age.
+1. With the age feature: the same model, retrained with customer_age as an input.
+2. Vigil: age is never used to score ("fairness through unawareness"). This is what ships.
 3. Equal burden: scale down the risk of the older group until both groups have the same share of
    legitimate applicants reviewed or declined. Set on the validation month, applied unchanged.
 
@@ -62,10 +62,10 @@ def equalising(valid: pd.DataFrame) -> float:
     return float(np.exp((low + high) / 2))
 
 
-def withoutage() -> tuple[np.ndarray, np.ndarray, dict]:
-    """Retrain the shipped model without customer_age; calibrated test probabilities."""
+def withage() -> tuple[np.ndarray, dict]:
+    """Retrain the shipped model with customer_age added; calibrated test probabilities."""
     bundle = train.joblib.load(train.modelpath)
-    cols = [c for c in bundle["features"] if c != "customer_age"]
+    cols = bundle["features"] + ["customer_age"]
     fit, valid, test = prepare.split(prepare.load())
     model = train.gbm(fit, valid, cols)
     validscore = model.predict_proba(valid[cols])[:, 1]
@@ -73,7 +73,7 @@ def withoutage() -> tuple[np.ndarray, np.ndarray, dict]:
     iso = IsotonicRegression(out_of_bounds="clip").fit(validscore, valid[config.target])
     y = test[config.target].to_numpy()
     paper = metrics.summary(y, testscore, prepare.older(test))
-    return iso.predict(testscore), testscore, paper
+    return iso.predict(testscore), paper
 
 
 def main() -> None:
@@ -82,12 +82,12 @@ def main() -> None:
     y, limit = test[config.target].to_numpy(), test["proposed_credit_limit"].to_numpy()
     older = prepare.older(test)
 
-    print("retraining without the age feature...")
-    noage, noagescore, noagepaper = withoutage()
+    print("retraining with the age feature, for comparison...")
+    agep, agepaper = withage()
     k = equalising(valid)
     options = {
+        "With the age feature": agep,
         "Vigil": test["probability"].to_numpy(),
-        "Without the age feature": noage,
         "Equal burden across age groups": scaled(test["probability"].to_numpy(), older, k),
     }
     choices = {name: engine.decide(p, limit) for name, p in options.items()}
@@ -114,8 +114,8 @@ def main() -> None:
             groups.append({"option": name, "group": g} | b[g])
 
     paper = {
-        "with_age": metrics.summary(y, test["score_lightgbm_stable"], older)["fpr_ratio_age"],
-        "without_age": noagepaper["fpr_ratio_age"],
+        "with_age": agepaper["fpr_ratio_age"],
+        "without_age": metrics.summary(y, test["score_lightgbm_stable"], older)["fpr_ratio_age"],
     }
     out = config.reportsdir / "fairness"
     out.mkdir(parents=True, exist_ok=True)
@@ -127,7 +127,7 @@ def main() -> None:
         "share_over50": float(older.mean()),
         "older_multiplier": k,
         "paper_fpr_ratio_at_5fpr": paper,
-        "recall_at_5fpr_without_age": noagepaper["recall_at_5fpr"],
+        "recall_at_5fpr_with_age": agepaper["recall_at_5fpr"],
         "options": table.round(4).to_dict(orient="index"),
         "groups": groups,
     }
@@ -144,7 +144,7 @@ def main() -> None:
                     "fraud_rate",
                     "older_multiplier",
                     "paper_fpr_ratio_at_5fpr",
-                    "recall_at_5fpr_without_age",
+                    "recall_at_5fpr_with_age",
                 ]
             },
             indent=2,

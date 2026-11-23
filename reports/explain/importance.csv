@@ -1,27 +1,26 @@
 ,label,mean_abs_shap
-device_os,Device operating system,0.4099
-phone_home_valid,Valid home phone,0.3446
-prev_address_months_count,Months at previous address,0.3418
-housing_status,Housing status,0.331
-has_other_cards,Has other cards,0.2773
-current_address_months_count,Months at current address,0.257
-keep_alive_session,Kept session alive,0.2494
-name_email_similarity,Name and email similarity,0.2452
-email_is_free,Free email provider,0.225
-income,Income decile,0.2248
-employment_status,Employment status,0.1736
-intended_balcon_amount,Initial transfer amount,0.1697
-credit_risk_score,Credit risk score,0.1548
-bank_branch_count_8w,"Applications at the same branch, 8 weeks",0.1448
-zip_count_4w,"Applications from the same zip code, 4 weeks",0.1248
-customer_age,Age group,0.1213
-bank_months_count,Months with previous bank,0.1165
-days_since_request,Days since request,0.1104
-date_of_birth_distinct_emails_4w,"Emails sharing this birth date, 4 weeks",0.0929
-session_length_in_minutes,"Session length, minutes",0.0861
-proposed_credit_limit,Proposed credit limit,0.0749
-device_distinct_emails_8w,"Emails used on this device, 8 weeks",0.0513
-phone_mobile_valid,Valid mobile phone,0.0254
-payment_type,Payment plan,0.0247
-foreign_request,Request from abroad,0.0207
+device_os,Device operating system,0.4101
+prev_address_months_count,Months at previous address,0.3416
+housing_status,Housing status,0.3398
+phone_home_valid,Valid home phone,0.3336
+has_other_cards,Has other cards,0.2794
+current_address_months_count,Months at current address,0.2543
+name_email_similarity,Name and email similarity,0.2472
+keep_alive_session,Kept session alive,0.2464
+email_is_free,Free email provider,0.2294
+income,Income decile,0.2201
+employment_status,Employment status,0.1593
+intended_balcon_amount,Initial transfer amount,0.147
+bank_branch_count_8w,"Applications at the same branch, 8 weeks",0.1431
+credit_risk_score,Credit risk score,0.1366
+date_of_birth_distinct_emails_4w,"Emails sharing this birth date, 4 weeks",0.1318
+zip_count_4w,"Applications from the same zip code, 4 weeks",0.1137
+days_since_request,Days since request,0.1092
+bank_months_count,Months with previous bank,0.1085
+session_length_in_minutes,"Session length, minutes",0.0774
+proposed_credit_limit,Proposed credit limit,0.0765
+device_distinct_emails_8w,"Emails used on this device, 8 weeks",0.0516
+phone_mobile_valid,Valid mobile phone,0.0268
+foreign_request,Request from abroad,0.0193
+payment_type,Payment plan,0.0184
 source,Application channel,0.0001

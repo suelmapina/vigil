@@ -126,17 +126,8 @@ def main(sample: int = 20000) -> None:
             }
         )
 
-    older = prepare.older(rows)
-    legit = (rows[config.target] == 0).to_numpy()
-    agepush = {
-        "older_legit": float(shap.loc[older & legit, "customer_age"].mean()),
-        "younger_legit": float(shap.loc[~older & legit, "customer_age"].mean()),
-    }
-    (out / "examples.json").write_text(
-        json.dumps({"examples": examples, "age_shap": agepush}, indent=2)
-    )
+    (out / "examples.json").write_text(json.dumps({"examples": examples}, indent=2))
     print(table.head(12).to_string())
-    print(json.dumps(agepush, indent=2))
     for e in examples[:3]:
         print(e)
 
