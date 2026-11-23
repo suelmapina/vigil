@@ -171,7 +171,7 @@ take weeks to mature.
 - **The popular "score drift" metric missed it.** The score distribution as a whole barely moved
   (PSI 0.005), because the shift sits in the top 5 % of scores, where decisions are made.
   Monitoring has to look where the decisions are.
-- **Cost per application rose about 27 % from month 5**, mostly because there was more fraud
+- **Cost per application rose about 28 % from month 5**, mostly because there was more fraud
   (1.18 % to 1.47 %), not because the model got worse: fraud caught at 5 % FPR went up, from
   54.5 % to 58.3 %.
 
