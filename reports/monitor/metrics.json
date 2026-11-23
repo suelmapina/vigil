@@ -1,0 +1,81 @@
+{
+  "alerts": {
+    "score_psi": 0.1,
+    "flagged_over_reference": 1.15,
+    "feature_psi": 0.25,
+    "fpr_over_target": 1.2,
+    "fairness_drop": 0.8
+  },
+  "production": [
+    {
+      "month": 5,
+      "applications": 119323,
+      "fraud_rate": 0.0118,
+      "score_psi": 0.0,
+      "worst_feature": "zip_count_4w",
+      "worst_feature_psi": 0.1965,
+      "flagged_share": 0.0559,
+      "fpr_fixed_threshold": 0.05,
+      "recall_fixed_threshold": 0.545,
+      "recall_at_5fpr": 0.545,
+      "cost_per_1k": 4550.2879,
+      "fairness_balance": 0.374,
+      "alerts": ""
+    },
+    {
+      "month": 6,
+      "applications": 108168,
+      "fraud_rate": 0.0134,
+      "score_psi": 0.0053,
+      "worst_feature": "date_of_birth_distinct_emails_4w",
+      "worst_feature_psi": 0.337,
+      "flagged_share": 0.0673,
+      "fpr_fixed_threshold": 0.0606,
+      "recall_fixed_threshold": 0.5566,
+      "recall_at_5fpr": 0.5241,
+      "cost_per_1k": 5837.1607,
+      "fairness_balance": 0.3443,
+      "alerts": "more applications flagged; input drift (date_of_birth_distinct_emails_4w); false positives over plan"
+    },
+    {
+      "month": 7,
+      "applications": 96843,
+      "fraud_rate": 0.0147,
+      "score_psi": 0.0235,
+      "worst_feature": "zip_count_4w",
+      "worst_feature_psi": 0.8637,
+      "flagged_share": 0.0546,
+      "fpr_fixed_threshold": 0.0469,
+      "recall_fixed_threshold": 0.5742,
+      "recall_at_5fpr": 0.5826,
+      "cost_per_1k": 5793.5008,
+      "fairness_balance": 0.3365,
+      "alerts": "input drift (zip_count_4w)"
+    }
+  ],
+  "backtest_mean": {
+    "monthly": {
+      "cost_per_1k": 5402.856,
+      "recall_at_5fpr": 0.5473
+    },
+    "static": {
+      "cost_per_1k": 5462.5064,
+      "recall_at_5fpr": 0.5427
+    }
+  },
+  "shadow": {
+    "month": 7,
+    "champion": "fit on months 0 to 4, tuned on 5",
+    "challenger": "fit on months 0 to 5, tuned on 6",
+    "champion_cost": 561060.0,
+    "challenger_cost": 562546.0,
+    "saving": -1486.0,
+    "saving_low": -15863.75,
+    "saving_high": 12084.6,
+    "champion_recall_at_5fpr": 0.5826330532212886,
+    "challenger_recall_at_5fpr": 0.5784313725490197,
+    "champion_fairness": 0.33645192122551104,
+    "challenger_fairness": 0.39305510267047844,
+    "promote": false
+  }
+}

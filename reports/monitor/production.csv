@@ -1,0 +1,4 @@
+month,applications,fraud_rate,score_psi,worst_feature,worst_feature_psi,flagged_share,fpr_fixed_threshold,recall_fixed_threshold,recall_at_5fpr,cost_per_1k,fairness_balance,alerts
+5,119323,0.0118,0.0,zip_count_4w,0.1965,0.0559,0.05,0.545,0.545,4550.2879,0.374,
+6,108168,0.0134,0.0053,date_of_birth_distinct_emails_4w,0.337,0.0673,0.0606,0.5566,0.5241,5837.1607,0.3443,more applications flagged; input drift (date_of_birth_distinct_emails_4w); false positives over plan
+7,96843,0.0147,0.0235,zip_count_4w,0.8637,0.0546,0.0469,0.5742,0.5826,5793.5008,0.3365,input drift (zip_count_4w)

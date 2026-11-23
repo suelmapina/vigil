@@ -79,8 +79,10 @@ def logistic(fit: pd.DataFrame, cols: list[str]):
     return model.fit(fit[cols], fit[config.target])
 
 
-def gbm(fit: pd.DataFrame, valid: pd.DataFrame, cols: list[str]) -> lgb.LGBMClassifier:
-    model = lgb.LGBMClassifier(**treeparams)
+def gbm(
+    fit: pd.DataFrame, valid: pd.DataFrame, cols: list[str], params: dict | None = None
+) -> lgb.LGBMClassifier:
+    model = lgb.LGBMClassifier(**(treeparams | (params or {})))
     model.fit(
         fit[cols],
         fit[config.target],

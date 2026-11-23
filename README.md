@@ -1,7 +1,7 @@
 # 🛡️ Vigil: Cost-Aware Fraud Screening for Account Opening
 
 > **Work in progress.** Done so far: data, drift analysis, model comparison, cost-based decisions,
-> reason codes and fairness. Next: monitoring, API and demo.
+> reason codes, fairness and monitoring. Next: API and demo.
 
 ## The business problem
 
@@ -151,12 +151,66 @@ rates differ. Any fix is a choice, so each option is priced:
 - **Fairness also drifts.** The equal burden adjustment was set to balance month 5 exactly; on the
   test months the balance is 0.74, not 1. Group error rates need monitoring like any other metric.
 
+## 5. After go-live: monitoring and retraining
+
+**What the monthly report would have shown.** The shipped model goes live in month 6. Some signals
+need no labels and are available the day applications arrive; others need fraud outcomes, which
+take weeks to mature.
+
+| Month | Share flagged¹ | Model score drift (PSI)¹ | Largest input drift (PSI)¹ | FPR² | Cost per 1,000 applications² | Alerts |
+|---|---|---|---|---|---|---|
+| 5 (tuning) | 5.6 % | 0 | 0.20 | 5.0 % | €4,550 | |
+| 6 | **6.7 %** | 0.005 | **0.34** | **6.1 %** | €5,837 | more applications flagged; input drift; false positives over plan |
+| 7 | 5.5 % | 0.02 | **0.86** | 4.7 % | €5,794 | input drift |
+
+¹ no labels needed. ² needs fraud outcomes.
+
+- **The share of flagged applications is the early warning.** In month 6 it rose 20 % above the
+  tuning month, the same day the applications arrived; the false positive overrun it predicted
+  was only confirmed once labels matured.
+- **The popular "score drift" metric missed it.** The score distribution as a whole barely moved
+  (PSI 0.005), because the shift sits in the top 5 % of scores, where decisions are made.
+  Monitoring has to look where the decisions are.
+- **Cost per application rose about 27 % from month 5**, mostly because there was more fraud
+  (1.18 % to 1.47 %), not because the model got worse: fraud caught at 5 % FPR went up, from
+  54.5 % to 58.3 %.
+
+**Retrain monthly, or train once?** A backtest over months 3 to 7, with the same pipeline and a
+faster training setup: a model trained on months 0 and 1 and never touched, against a model
+retrained every month on all data up to the previous month.
+
+| Month | 3 | 4 | 5 | 6 | 7 | Mean |
+|---|---|---|---|---|---|---|
+| Cost per 1,000 applications, trained once | €5,050 | €5,340 | €4,825 | €5,953 | €6,145 | €5,463 |
+| Cost per 1,000 applications, retrained monthly | €5,050 | €5,497 | **€4,682** | **€5,813** | **€5,972** | **€5,403** |
+| FPR with a fixed threshold, trained once | 8.6 % | 8.9 % | 5.8 % | 6.9 % | 5.5 % | |
+| FPR with a fixed threshold, retrained monthly | 8.6 % | 5.4 % | 3.1 % | 6.0 % | 3.8 % | |
+
+Retraining saves about 1 % on average and wins the last three months; the model trained once
+flags more legitimate customers than planned in every month. Retraining is worth having, but
+it is not a large effect on its own, and a threshold tuned on a single month is noisy in both
+directions.
+
+**Shadow test before any swap.** In month 7 a challenger (same pipeline, one more month of data)
+scored every application alongside the live model without acting on it. Rule: promote only if it
+is cheaper with 95 % confidence and not less fair.
+
+| Month 7 | Live model | Challenger |
+|---|---|---|
+| Cost | €561.1k | €562.5k |
+| Fraud caught at 5 % FPR | 58.3 % | 57.8 % |
+| Fairness balance | 0.34 | 0.39 |
+
+The challenger costs €1.5k more (95 % CI −€12k to +€16k): no measurable gain, so **it is not
+promoted**. It is fairer, which is worth recording: if the team values that, the promotion rule
+should say so explicitly rather than be bent case by case.
+
 ## Quickstart
 
 ```bash
 make install       # uv sync, Python 3.11
 make data          # BAF base from Kaggle (needs a Kaggle API token in ~/.kaggle)
-make all           # drift, models, decisions, reasons and fairness (~7 min)
+make all           # drift, models, decisions, reasons, fairness, monitoring (~16 min)
 make test          # unit tests
 make mlflow        # experiment tracking UI
 ```

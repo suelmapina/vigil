@@ -57,3 +57,26 @@ def test_outcome_counts():
     out = engine.outcome(y, np.full(4, 500.0), choice)
     assert out["declined"] == 2 and out["good_declined"] == 1 and out["reviews"] == 1
     assert out["fraud_stopped"] == pytest.approx((1 + engine.defaultcosts["catchrate"]) / 2)
+
+
+def test_monitoring_alerts():
+    from vigil import monitor
+
+    reference = {"flagged_share": 0.05, "fairness_balance": 0.4}
+    quiet = {
+        "score_psi": 0.01,
+        "flagged_share": 0.051,
+        "worst_feature": "x",
+        "worst_feature_psi": 0.1,
+        "fpr_fixed_threshold": 0.05,
+        "fairness_balance": 0.39,
+    }
+    assert monitor.flags(quiet, reference) == []
+    loud = quiet | {
+        "flagged_share": 0.07,
+        "worst_feature_psi": 0.9,
+        "fpr_fixed_threshold": 0.07,
+        "fairness_balance": 0.2,
+        "score_psi": 0.3,
+    }
+    assert len(monitor.flags(loud, reference)) == 5

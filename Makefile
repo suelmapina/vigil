@@ -1,4 +1,4 @@
-.PHONY: help install data drift model decision explain fairness all lint format test mlflow clean
+.PHONY: help install data drift model decision explain fairness monitor all lint format test mlflow clean
 
 help:  ## Show available commands
 	@grep -E "^[a-zA-Z_-]+:.*?## " $(MAKEFILE_LIST) | awk "BEGIN {FS = \":.*?## \"}; {printf \"  \033[36m%-14s\033[0m %s\n\", \$$1, \$$2}"
@@ -24,7 +24,10 @@ explain:  ## Reason codes and global feature importance (TreeSHAP)
 fairness:  ## Burden by age group and the cost of three fairness options (~2 min)
 	uv run python -m vigil.fairness
 
-all: drift model decision explain fairness  ## Run the full pipeline
+monitor:  ## Monthly monitoring report, retraining backtest and shadow test (~9 min)
+	uv run python -m vigil.monitor
+
+all: drift model decision explain fairness monitor  ## Run the full pipeline
 
 lint:  ## Lint with ruff
 	uv run ruff check src tests
