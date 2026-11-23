@@ -82,3 +82,9 @@ def test_age_is_ignored(client, sample):
 def test_bad_input_is_rejected(client, sample):
     assert client.post("/score", json=dict(sample[0], income=5)).status_code == 422
     assert client.post("/score", json={"income": 0.5}).status_code == 422
+
+
+def test_unknown_category_is_rejected_not_guessed(client, sample):
+    r = client.post("/score", json=dict(sample[0], device_os="android"))
+    assert r.status_code == 422
+    assert "device_os" in r.json()["detail"]

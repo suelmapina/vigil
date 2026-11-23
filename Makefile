@@ -1,4 +1,4 @@
-.PHONY: help install data drift model decision explain fairness monitor all api loadtest docker demo-data demo lint format test mlflow clean
+.PHONY: help install data drift model decision explain fairness monitor all api loadtest docker demo-data demo figures lint format test mlflow clean
 
 help:  ## Show available commands
 	@grep -E "^[a-zA-Z_-]+:.*?## " $(MAKEFILE_LIST) | awk "BEGIN {FS = \":.*?## \"}; {printf \"  \033[36m%-14s\033[0m %s\n\", \$$1, \$$2}"
@@ -27,7 +27,7 @@ fairness:  ## Burden by age group and the cost of three fairness options (~2 min
 monitor:  ## Monthly monitoring report, retraining backtest and shadow test (~9 min)
 	uv run python -m vigil.monitor
 
-all: drift model decision explain fairness monitor  ## Run the full pipeline
+all: drift model decision explain fairness monitor demo-data  ## Run the full pipeline
 
 api:  ## Serve the scoring API on http://localhost:8000/docs
 	uv run uvicorn vigil.api.main:app --port 8000
@@ -44,6 +44,9 @@ demo-data:  ## Write the small files the hosted demo needs into app/data
 
 demo:  ## Open the Streamlit demo on http://localhost:8501
 	uv run streamlit run src/vigil/demo.py
+
+figures:  ## Re-render README figures from saved results (no retraining)
+	uv run python -m vigil.figures
 
 lint:  ## Lint with ruff
 	uv run ruff check src tests

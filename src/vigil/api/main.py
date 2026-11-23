@@ -15,7 +15,7 @@ from contextlib import asynccontextmanager
 
 import joblib
 import numpy as np
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 
 from vigil import config, explain, version
@@ -104,6 +104,18 @@ def value(feature: str, raw):
     return raw
 
 
+def check(rows: list[dict]) -> None:
+    """Reject categories the model never saw, instead of silently scoring them as missing."""
+    for i, row in enumerate(rows):
+        for f, known in state["codes"].items():
+            if row[f] not in known:
+                where = f"item {i}: " if len(rows) > 1 else ""
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"{where}unknown {f} '{row[f]}', expected one of {sorted(known)}",
+                )
+
+
 def matrix(rows: list[dict]) -> np.ndarray:
     features, codes = state["bundle"]["features"], state["codes"]
     x = np.empty((len(rows), len(features)))
@@ -141,6 +153,7 @@ def score(items: list[application], always: bool = False) -> list[decision]:
     """
     bundle = state["bundle"]
     rows = [a.model_dump() for a in items]
+    check(rows)
     x = matrix(rows)
     raw = bundle["model"].booster_.predict(x, num_threads=1)
     p = bundle["calibrator"].predict(raw)

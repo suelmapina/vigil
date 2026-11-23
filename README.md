@@ -1,5 +1,7 @@
 # 🛡️ Vigil: Cost-Aware Fraud Screening for Account Opening
 
+[![ci](https://github.com/suelmapina/vigil/actions/workflows/ci.yml/badge.svg)](https://github.com/suelmapina/vigil/actions/workflows/ci.yml)
+
 > **TL;DR:** On two months the model never saw (205k applications), choosing approve, review or
 > decline by **expected cost** cuts the cost of fraud and screening by **45 %** against a rules
 > engine (**€963k** saved, 95 % CI €887k to €1.05M) with the same analyst team. The model never
@@ -18,7 +20,8 @@ threshold tuned today can quietly stop working next month.
 [Bank Account Fraud (BAF)](https://github.com/feedzai/bank-account-fraud), base variant: 1,000,000
 applications over 8 months, 30 features, 1.10 % fraud. It was generated from real bank data with
 privacy protection, and published by Feedzai at NeurIPS 2022. Licensed CC BY-NC-SA 4.0; downloaded
-from Kaggle with `make data` and never committed.
+from Kaggle with `make data`. The raw data is never committed; the small derived files the demo
+needs (`app/data`) are shared under the same licence.
 
 **Split by time, as in production.** Fit on months 0 to 4, tune on month 5 (early stopping,
 calibration, thresholds), report on months 6 and 7, which no model or decision has seen.
@@ -29,6 +32,8 @@ One column is constant and is dropped. **Age is kept to measure fairness but is 
 score** (section 4 explains why).
 
 ## 1. The data moves
+
+![Fraud rate per month](reports/figures/monthly.png)
 
 | Month | 0 | 1 | 2 | 3 | 4 | 5 | **6** | **7** |
 |---|---|---|---|---|---|---|---|---|
@@ -103,6 +108,8 @@ every policy):
 
 95 % intervals from 200 paired bootstrap resamples.
 
+![Total cost by policy](reports/figures/policies.png)
+
 - **Against the rules setup, Vigil cuts the cost of fraud and screening by 45 %** (€963k over two
   months) with the same analyst team.
 - **Most of the gain comes from the model; the last €229k from the decision rule.** Same model,
@@ -135,6 +142,8 @@ Categories are anonymised in the dataset (BA, CA and so on); in a bank they woul
 (2.9 % vs 1.1 %). A model that gets the risk right for both groups will therefore stop more of
 their legitimate applicants too: equal error rates and equal calibration cannot both hold when base
 rates differ. Any fix is a choice, so each option is priced:
+
+![Genuine applicants stopped by age](reports/figures/fairness.png)
 
 | Option | Good applicants stopped, under 50 / 50+ | Balance (1 = equal) | Fraud stopped | Cost vs Vigil (95 % CI) |
 |---|---|---|---|---|
@@ -271,12 +280,53 @@ a good customer, analyst cost and analyst capacity:
 It runs from small files in `app/data` (`make demo-data`), so it needs neither the dataset nor the
 training stack.
 
+## Limitations and what a production version would add
+
+- **Synthetic data.** BAF is generated from real bank data with privacy protection; categories are
+  anonymised, so reason codes such as "Housing status: BA" would be readable in a real bank.
+- **Illustrative costs.** A fraudster is assumed to draw the full credit line and analysts to stop
+  90 % of the fraud they review. Every cost is a parameter, and the demo lets you change them.
+- **The rules baseline was written after looking at the data**, including the fraud rate of
+  missing fields over all months. That makes the baseline stronger than a blind one, so the
+  comparison is, if anything, conservative.
+- **The flagged-share alert threshold (+15 %) was set after seeing month 6.** Its detection of
+  month 6 is an illustration of the idea, not evidence of its hit rate; a real threshold would be
+  set on a longer history.
+- **Intervals cover sampling of applications, not retraining.** The bootstrap holds the model and
+  thresholds fixed; variation across training runs is not included.
+- **Labels are assumed to mature before each monthly report.** In production fraud outcomes
+  arrive with a delay, which is why label-free signals matter.
+- **Analyst capacity is a share of volume.** A real queue also has arrival times and service
+  levels; the API exposes `reviewsaving` so a case management system can prioritise.
+- **Not included:** authentication on the API, a feature store for real-time velocity features,
+  and a model registry with approval workflow (runs are tracked in MLflow).
+
+## Project structure
+
+```
+src/vigil/
+├── data/          # download (Kaggle) and cleaning
+├── drift.py       # population stability index by feature and month
+├── model/         # temporal split, rules, logistic, LightGBM, calibration, metrics
+├── decision/      # cost-based engine with analyst capacity, policy simulation
+├── explain.py     # reason codes from TreeSHAP
+├── fairness.py    # burden by age group and the price of each option
+├── monitor.py     # monthly report, retraining backtest, shadow test
+├── api/           # FastAPI scoring service and load test
+├── demo.py        # Streamlit app
+└── figures.py     # README figures from saved results
+app/               # hosted demo entry point, light requirements, small data files
+reports/           # every number in this README, as json and csv
+tests/             # unit and end-to-end tests (CI on every push)
+```
+
 ## Quickstart
 
 ```bash
 make install       # uv sync, Python 3.11
 make data          # BAF base from Kaggle (needs a Kaggle API token in ~/.kaggle)
-make all           # drift, models, decisions, reasons, fairness, monitoring (~16 min)
+make all           # drift, models, decisions, reasons, fairness, monitoring, demo data (~16 min)
+make figures       # README figures from saved results
 make test          # unit tests
 make demo          # interactive demo on http://localhost:8501
 make api           # scoring API on http://localhost:8000/docs
@@ -288,3 +338,8 @@ make mlflow        # experiment tracking UI
 > Jesus, S., Pombal, J., Alves, D., Cruz, A., Saleiro, P., Ribeiro, R. P., Gama, J., and Bizarro, P.
 > (2022). Turning the Tables: Biased, Imbalanced, Dynamic Tabular Datasets for ML Evaluation.
 > NeurIPS 2022.
+
+## Licence
+
+Code: MIT. Data and the derived files in `app/data`: CC BY-NC-SA 4.0, from the Feedzai Bank Account
+Fraud dataset suite; non-commercial use with attribution, adaptations under the same licence.

@@ -1,0 +1,44 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Install (exact versions from uv.lock)
+        run: uv sync --frozen
+      - name: Lint
+        run: |
+          uv run ruff check src tests app
+          uv run ruff format --check src tests app
+      - name: Tests
+        # tests that need the Kaggle data or a trained model skip themselves;
+        # the demo test runs end to end on the committed files in app/data
+        run: uv run pytest -q
+
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install the hosted demo dependencies only
+        run: pip install -r app/requirements.txt
+      - name: Demo renders without the training stack
+        run: |
+          python - <<PY
+          from streamlit.testing.v1 import AppTest
+          app = AppTest.from_file("app/streamlit_app.py", default_timeout=240)
+          app.run()
+          assert not app.exception, app.exception
+          print("demo ok")
+          PY
