@@ -1,0 +1,4 @@
+option,cost,extra_cost,extra_low,extra_high,fraud_stopped,burden_ratio
+Vigil,1195267.0,0.0,0.0,0.0,0.3413,0.2665
+Without the age feature,1190001.0,-5266.0,-23442.25,12550.3,0.3407,0.336
+Equal burden across age groups,1278194.0,82927.0,55113.625,113579.95,0.3026,0.8871

@@ -1,0 +1,83 @@
+{
+  "fraud_rate": {
+    "under50": 0.011031816482900393,
+    "over50": 0.02927854584209124
+  },
+  "share_over50": 0.16476676861241593,
+  "older_multiplier": 0.33118706749742494,
+  "paper_fpr_ratio_at_5fpr": {
+    "with_age": 0.29599285614804866,
+    "without_age": 0.3983309875714506
+  },
+  "recall_at_5fpr_without_age": 0.5437804030576789,
+  "options": {
+    "Vigil": {
+      "cost": 1195267.0,
+      "extra_cost": 0.0,
+      "extra_low": 0.0,
+      "extra_high": 0.0,
+      "fraud_stopped": 0.3413,
+      "burden_ratio": 0.2665
+    },
+    "Without the age feature": {
+      "cost": 1190001.0,
+      "extra_cost": -5266.0,
+      "extra_low": -23442.25,
+      "extra_high": 12550.3,
+      "fraud_stopped": 0.3407,
+      "burden_ratio": 0.336
+    },
+    "Equal burden across age groups": {
+      "cost": 1278194.0,
+      "extra_cost": 82927.0,
+      "extra_low": 55113.625,
+      "extra_high": 113579.95,
+      "fraud_stopped": 0.3026,
+      "burden_ratio": 0.8871
+    }
+  },
+  "groups": [
+    {
+      "option": "Vigil",
+      "group": "under50",
+      "good_stopped": 0.018329662283058646,
+      "good_declined": 0.0026514234423625424,
+      "fraud_stopped": 0.2863949179460032
+    },
+    {
+      "option": "Vigil",
+      "group": "over50",
+      "good_stopped": 0.06877096675815797,
+      "good_declined": 0.012259835315645014,
+      "fraud_stopped": 0.5085945399393327
+    },
+    {
+      "option": "Without the age feature",
+      "group": "under50",
+      "good_stopped": 0.020331516507915887,
+      "good_declined": 0.0031002167199116588,
+      "fraud_stopped": 0.3054526204340921
+    },
+    {
+      "option": "Without the age feature",
+      "group": "over50",
+      "good_stopped": 0.060506251906068925,
+      "good_declined": 0.011314425129612686,
+      "fraud_stopped": 0.46814964610717896
+    },
+    {
+      "option": "Equal burden across age groups",
+      "group": "under50",
+      "good_stopped": 0.02345535392664592,
+      "good_declined": 0.002574656171202825,
+      "fraud_stopped": 0.33298041291688724
+    },
+    {
+      "option": "Equal burden across age groups",
+      "group": "over50",
+      "good_stopped": 0.026440988106129916,
+      "good_declined": 0.00024397682220189082,
+      "fraud_stopped": 0.3185035389282103
+    }
+  ]
+}

@@ -15,7 +15,6 @@ dependencies = [
     # modelling
     "scikit-learn>=1.4",
     "lightgbm>=4.3",
-    "shap>=0.45",         # per-decision reason codes
     # tracking, serving & demo
     "mlflow>=2.12",
     "fastapi>=0.110",

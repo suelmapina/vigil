@@ -1,4 +1,4 @@
-.PHONY: help install data drift model decision all lint format test mlflow clean
+.PHONY: help install data drift model decision explain fairness all lint format test mlflow clean
 
 help:  ## Show available commands
 	@grep -E "^[a-zA-Z_-]+:.*?## " $(MAKEFILE_LIST) | awk "BEGIN {FS = \":.*?## \"}; {printf \"  \033[36m%-14s\033[0m %s\n\", \$$1, \$$2}"
@@ -18,7 +18,13 @@ model:  ## Fit and compare fraud models on the temporal split (~4 min)
 decision:  ## Compare screening policies in euros on the test months
 	uv run python -m vigil.decision.simulate
 
-all: drift model decision  ## Run the full pipeline
+explain:  ## Reason codes and global feature importance (TreeSHAP)
+	uv run python -m vigil.explain
+
+fairness:  ## Burden by age group and the cost of three fairness options (~2 min)
+	uv run python -m vigil.fairness
+
+all: drift model decision explain fairness  ## Run the full pipeline
 
 lint:  ## Lint with ruff
 	uv run ruff check src tests

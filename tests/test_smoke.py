@@ -21,8 +21,6 @@ def test_split_is_temporal():
     assert max(config.trainmonths) < min(config.testmonths)
 
 
-@pytest.mark.parametrize(
-    "module", ["lightgbm", "shap", "mlflow", "fastapi", "streamlit", "kagglehub"]
-)
+@pytest.mark.parametrize("module", ["lightgbm", "mlflow", "fastapi", "streamlit", "kagglehub"])
 def test_dependencies_import(module):
     importlib.import_module(module)

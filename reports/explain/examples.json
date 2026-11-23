@@ -1,0 +1,118 @@
+{
+  "examples": [
+    {
+      "probability": 0.15,
+      "credit_limit": 1500.0,
+      "fraud": false,
+      "reasons": [
+        {
+          "feature": "credit_risk_score",
+          "text": "Credit risk score: 311",
+          "impact": 0.8
+        },
+        {
+          "feature": "housing_status",
+          "text": "Housing status: BA",
+          "impact": 0.75
+        },
+        {
+          "feature": "device_os",
+          "text": "Device operating system: windows",
+          "impact": 0.706
+        }
+      ]
+    },
+    {
+      "probability": 0.248,
+      "credit_limit": 1000.0,
+      "fraud": false,
+      "reasons": [
+        {
+          "feature": "housing_status",
+          "text": "Housing status: BA",
+          "impact": 0.879
+        },
+        {
+          "feature": "device_os",
+          "text": "Device operating system: windows",
+          "impact": 0.764
+        },
+        {
+          "feature": "income",
+          "text": "Income decile: 0.90",
+          "impact": 0.638
+        }
+      ]
+    },
+    {
+      "probability": 0.099,
+      "credit_limit": 2000.0,
+      "fraud": true,
+      "reasons": [
+        {
+          "feature": "proposed_credit_limit",
+          "text": "Proposed credit limit: 2000",
+          "impact": 1.555
+        },
+        {
+          "feature": "name_email_similarity",
+          "text": "Name and email similarity: 0.10",
+          "impact": 0.435
+        },
+        {
+          "feature": "current_address_months_count",
+          "text": "Months at current address: 84",
+          "impact": 0.423
+        }
+      ]
+    },
+    {
+      "probability": 0.099,
+      "credit_limit": 1500.0,
+      "fraud": false,
+      "reasons": [
+        {
+          "feature": "housing_status",
+          "text": "Housing status: BA",
+          "impact": 0.875
+        },
+        {
+          "feature": "device_os",
+          "text": "Device operating system: windows",
+          "impact": 0.87
+        },
+        {
+          "feature": "credit_risk_score",
+          "text": "Credit risk score: 299",
+          "impact": 0.752
+        }
+      ]
+    },
+    {
+      "probability": 0.133,
+      "credit_limit": 1000.0,
+      "fraud": false,
+      "reasons": [
+        {
+          "feature": "housing_status",
+          "text": "Housing status: BA",
+          "impact": 0.926
+        },
+        {
+          "feature": "device_os",
+          "text": "Device operating system: windows",
+          "impact": 0.772
+        },
+        {
+          "feature": "date_of_birth_distinct_emails_4w",
+          "text": "Emails sharing this birth date, 4 weeks: 1",
+          "impact": 0.75
+        }
+      ]
+    }
+  ],
+  "age_shap": {
+    "older_legit": 0.3428081797187637,
+    "younger_legit": -0.07639164229083069
+  }
+}
