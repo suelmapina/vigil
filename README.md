@@ -1,7 +1,7 @@
 # 🛡️ Vigil: Cost-Aware Fraud Screening for Account Opening
 
-> **Work in progress.** Done so far: data, drift analysis and model comparison. Next: cost-based
-> decisions, explanations and fairness, monitoring, API and demo.
+> **Work in progress.** Done so far: data, drift analysis, model comparison and cost-based
+> decisions. Next: explanations and fairness, monitoring, API and demo.
 
 ## The business problem
 
@@ -76,12 +76,55 @@ keeps rising after month 5. This matters for the cost-based decisions in the nex
 engine is much fairer (0.90) but catches less than half as much fraud. This trade-off gets its
 own analysis.
 
+## 3. From scores to decisions, in euros
+
+A score is not a decision. Each application gets the cheapest of three actions, given its fraud
+probability *p* and its proposed credit limit *L*:
+
+| Action | Expected cost |
+|---|---|
+| Approve | *p* × *L* (a fraudster draws the credit line) |
+| Review | €20 analyst time + 10 % of the fraud loss that slips past the analyst + €2 delay for a good customer |
+| Decline | (1 − *p*) × €100 value of a good customer turned away |
+
+Analysts are a fixed resource: they can review **2.5 %** of applications. When more applications
+are worth reviewing, the ones where a review saves the most go first; the rest are approved or
+declined, whichever is cheaper. All costs are illustrative defaults and are adjustable.
+
+**Result on the two unseen months** (205,011 applications, 2,878 frauds, same analyst capacity for
+every policy):
+
+| Policy | Total cost | Fraud stopped | Good customers declined | Extra cost vs Vigil (95 % CI) |
+|---|---|---|---|---|
+| Approve everyone | €2.32M | 0 % | 0 | +€1.12M (1.04 to 1.20) |
+| Rules: analysts review the top alerts | €2.15M | 12 % | 0 | +€958k (879k to 1.04M) |
+| Model: analysts review the top scores | €1.39M | 34 % | 0 | +€196k (159k to 233k) |
+| Model: decline everything above 5 % FPR | €1.82M | 56 % | 10,711 | +€629k (605k to 654k) |
+| **Vigil: cost-based decision** | **€1.20M** | 34 % | 851 | |
+
+95 % intervals from 200 paired bootstrap resamples.
+
+- **Against the rules setup, Vigil cuts the cost of fraud and screening by 44 %** (€958k over two
+  months) with the same analyst team.
+- **Most of the gain comes from the model; the last €196k from the decision rule.** Same model,
+  same analysts: using expected cost instead of the raw score ranking sends analysts to the
+  applications where a mistake would be most expensive, and declines the clearest cases outright.
+- **The 5 % FPR rule stops the most fraud and is still €629k more expensive**, because it turns away
+  10,711 legitimate applicants. A benchmark operating point is not a business one.
+- **Exposure drives the decision.** Applications asking for a €1,500 to €2,100 credit line are
+  reviewed 15 % of the time and declined 5.5 %; those asking for €200 are approved 99.8 % of the
+  time. A €2,000 line is worth checking at a fraud risk that a €200 line is not.
+- **Vigil is the cheapest policy in all 25 scenarios tested** (value of a good customer from €25 to
+  €400, analyst capacity from 0.5 % to 10 %).
+- **Calibration barely changes the result here** (+€6k without it, within noise), because the
+  decisions depend mostly on the ranking and the credit limit.
+
 ## Quickstart
 
 ```bash
 make install       # uv sync, Python 3.11
 make data          # BAF base from Kaggle (needs a Kaggle API token in ~/.kaggle)
-make all           # drift report + model comparison (~4 min)
+make all           # drift report, model comparison and decision simulation (~5 min)
 make test          # unit tests
 make mlflow        # experiment tracking UI
 ```

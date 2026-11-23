@@ -1,0 +1,7 @@
+policy,cost,fraud_loss,fraud_stopped,reviews,declined,good_declined,good_reviewed,vs_vigil,vs_vigil_low,vs_vigil_high
+Approve everyone,2316970.0,2316970.0,0.0,0,0,0,0,1121703.0,1037792.675,1204108.925
+Rules: review top alerts,2153288.0,2041318.0,0.122,5125,0,0,4735,958021.0,878750.15,1043233.25
+Model: review top scores,1391491.0,1280881.0,0.3346,5125,0,0,4055,196224.0,158892.9,233083.3
+Model: decline at 5% FPR,1824150.0,753050.0,0.5601,0,12323,10711,0,628883.0,604869.8,653701.45
+"Vigil, uncalibrated scores",1201438.0,1044962.0,0.3229,5125,762,451,4438,6171.0,-8759.6,18854.725
+Vigil: cost-based decision,1195267.0,998651.0,0.3413,5125,1278,851,4508,0.0,0.0,0.0

@@ -1,0 +1,76 @@
+lostcustomer,capacity,policy,cost
+25,0.005,Model: review top scores,1867566.0
+25,0.005,Model: decline at 5% FPR,1020825.0
+25,0.005,Vigil: cost-based decision,838021.0
+25,0.01,Model: review top scores,1691070.0
+25,0.01,Model: decline at 5% FPR,1020825.0
+25,0.01,Vigil: cost-based decision,838021.0
+25,0.025,Model: review top scores,1391491.0
+25,0.025,Model: decline at 5% FPR,1020825.0
+25,0.025,Vigil: cost-based decision,838021.0
+25,0.05,Model: review top scores,1190821.0
+25,0.05,Model: decline at 5% FPR,1020825.0
+25,0.05,Vigil: cost-based decision,838021.0
+25,0.1,Model: review top scores,1147460.0
+25,0.1,Model: decline at 5% FPR,1020825.0
+25,0.1,Vigil: cost-based decision,838021.0
+50,0.005,Model: review top scores,1867566.0
+50,0.005,Model: decline at 5% FPR,1288600.0
+50,0.005,Vigil: cost-based decision,1132901.0
+50,0.01,Model: review top scores,1691070.0
+50,0.01,Model: decline at 5% FPR,1288600.0
+50,0.01,Vigil: cost-based decision,1113528.0
+50,0.025,Model: review top scores,1391491.0
+50,0.025,Model: decline at 5% FPR,1288600.0
+50,0.025,Vigil: cost-based decision,1053401.0
+50,0.05,Model: review top scores,1190821.0
+50,0.05,Model: decline at 5% FPR,1288600.0
+50,0.05,Vigil: cost-based decision,955978.0
+50,0.1,Model: review top scores,1147460.0
+50,0.1,Model: decline at 5% FPR,1288600.0
+50,0.1,Vigil: cost-based decision,954133.0
+100,0.005,Model: review top scores,1867566.0
+100,0.005,Model: decline at 5% FPR,1824150.0
+100,0.005,Vigil: cost-based decision,1378266.0
+100,0.01,Model: review top scores,1691070.0
+100,0.01,Model: decline at 5% FPR,1824150.0
+100,0.01,Vigil: cost-based decision,1325527.0
+100,0.025,Model: review top scores,1391491.0
+100,0.025,Model: decline at 5% FPR,1824150.0
+100,0.025,Vigil: cost-based decision,1195267.0
+100,0.05,Model: review top scores,1190821.0
+100,0.05,Model: decline at 5% FPR,1824150.0
+100,0.05,Vigil: cost-based decision,1033862.0
+100,0.1,Model: review top scores,1147460.0
+100,0.1,Model: decline at 5% FPR,1824150.0
+100,0.1,Vigil: cost-based decision,990090.0
+200,0.005,Model: review top scores,1867566.0
+200,0.005,Model: decline at 5% FPR,2895250.0
+200,0.005,Vigil: cost-based decision,1592014.0
+200,0.01,Model: review top scores,1691070.0
+200,0.01,Model: decline at 5% FPR,2895250.0
+200,0.01,Vigil: cost-based decision,1476805.0
+200,0.025,Model: review top scores,1391491.0
+200,0.025,Model: decline at 5% FPR,2895250.0
+200,0.025,Vigil: cost-based decision,1239698.0
+200,0.05,Model: review top scores,1190821.0
+200,0.05,Model: decline at 5% FPR,2895250.0
+200,0.05,Vigil: cost-based decision,1061904.0
+200,0.1,Model: review top scores,1147460.0
+200,0.1,Model: decline at 5% FPR,2895250.0
+200,0.1,Vigil: cost-based decision,1005769.0
+400,0.005,Model: review top scores,1867566.0
+400,0.005,Model: decline at 5% FPR,5037450.0
+400,0.005,Vigil: cost-based decision,1713054.0
+400,0.01,Model: review top scores,1691070.0
+400,0.01,Model: decline at 5% FPR,5037450.0
+400,0.01,Vigil: cost-based decision,1535369.0
+400,0.025,Model: review top scores,1391491.0
+400,0.025,Model: decline at 5% FPR,5037450.0
+400,0.025,Vigil: cost-based decision,1249085.0
+400,0.05,Model: review top scores,1190821.0
+400,0.05,Model: decline at 5% FPR,5037450.0
+400,0.05,Vigil: cost-based decision,1067308.0
+400,0.1,Model: review top scores,1147460.0
+400,0.1,Model: decline at 5% FPR,5037450.0
+400,0.1,Vigil: cost-based decision,1012017.0

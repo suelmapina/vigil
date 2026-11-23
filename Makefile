@@ -1,4 +1,4 @@
-.PHONY: help install data drift model all lint format test mlflow clean
+.PHONY: help install data drift model decision all lint format test mlflow clean
 
 help:  ## Show available commands
 	@grep -E "^[a-zA-Z_-]+:.*?## " $(MAKEFILE_LIST) | awk "BEGIN {FS = \":.*?## \"}; {printf \"  \033[36m%-14s\033[0m %s\n\", \$$1, \$$2}"
@@ -15,7 +15,10 @@ drift:  ## Fraud rate and feature drift (PSI) per month
 model:  ## Fit and compare fraud models on the temporal split (~4 min)
 	uv run python -m vigil.model.train
 
-all: drift model  ## Run the full pipeline
+decision:  ## Compare screening policies in euros on the test months
+	uv run python -m vigil.decision.simulate
+
+all: drift model decision  ## Run the full pipeline
 
 lint:  ## Lint with ruff
 	uv run ruff check src tests

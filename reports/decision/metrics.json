@@ -1,0 +1,86 @@
+{
+  "costs": {
+    "drawshare": 1.0,
+    "reviewcost": 20.0,
+    "catchrate": 0.9,
+    "friction": 2.0,
+    "lostcustomer": 100.0
+  },
+  "capacity": 0.025,
+  "applications": 205011,
+  "frauds": 2878,
+  "policies": {
+    "Approve everyone": {
+      "cost": 2316970.0,
+      "fraud_loss": 2316970.0,
+      "fraud_stopped": 0.0,
+      "reviews": 0,
+      "declined": 0,
+      "good_declined": 0,
+      "good_reviewed": 0,
+      "vs_vigil": 1121703.0,
+      "vs_vigil_low": 1037792.675,
+      "vs_vigil_high": 1204108.925
+    },
+    "Rules: review top alerts": {
+      "cost": 2153288.0,
+      "fraud_loss": 2041318.0,
+      "fraud_stopped": 0.122,
+      "reviews": 5125,
+      "declined": 0,
+      "good_declined": 0,
+      "good_reviewed": 4735,
+      "vs_vigil": 958021.0,
+      "vs_vigil_low": 878750.15,
+      "vs_vigil_high": 1043233.25
+    },
+    "Model: review top scores": {
+      "cost": 1391491.0,
+      "fraud_loss": 1280881.0,
+      "fraud_stopped": 0.3346,
+      "reviews": 5125,
+      "declined": 0,
+      "good_declined": 0,
+      "good_reviewed": 4055,
+      "vs_vigil": 196224.0,
+      "vs_vigil_low": 158892.9,
+      "vs_vigil_high": 233083.3
+    },
+    "Model: decline at 5% FPR": {
+      "cost": 1824150.0,
+      "fraud_loss": 753050.0,
+      "fraud_stopped": 0.5601,
+      "reviews": 0,
+      "declined": 12323,
+      "good_declined": 10711,
+      "good_reviewed": 0,
+      "vs_vigil": 628883.0,
+      "vs_vigil_low": 604869.8,
+      "vs_vigil_high": 653701.45
+    },
+    "Vigil, uncalibrated scores": {
+      "cost": 1201438.0,
+      "fraud_loss": 1044962.0,
+      "fraud_stopped": 0.3229,
+      "reviews": 5125,
+      "declined": 762,
+      "good_declined": 451,
+      "good_reviewed": 4438,
+      "vs_vigil": 6171.0,
+      "vs_vigil_low": -8759.6,
+      "vs_vigil_high": 18854.725
+    },
+    "Vigil: cost-based decision": {
+      "cost": 1195267.0,
+      "fraud_loss": 998651.0,
+      "fraud_stopped": 0.3413,
+      "reviews": 5125,
+      "declined": 1278,
+      "good_declined": 851,
+      "good_reviewed": 4508,
+      "vs_vigil": 0.0,
+      "vs_vigil_low": 0.0,
+      "vs_vigil_high": 0.0
+    }
+  }
+}
