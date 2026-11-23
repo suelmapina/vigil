@@ -24,7 +24,9 @@ from sklearn.isotonic import IsotonicRegression
 from vigil import config
 from vigil.data import prepare
 from vigil.decision import engine
-from vigil.model import metrics, train
+from vigil.model import metrics
+
+withagepath = config.processeddir / "fairness_scores.parquet"
 
 
 def burden(y: np.ndarray, older: np.ndarray, choice: np.ndarray) -> dict:
@@ -47,14 +49,19 @@ def scaled(p: np.ndarray, older: np.ndarray, k: float) -> np.ndarray:
     return np.where(older, p * k, p)
 
 
-def equalising(valid: pd.DataFrame) -> float:
+def equalising(
+    valid: pd.DataFrame,
+    costs: dict | None = None,
+    capacity: float = engine.defaultcapacity,
+    steps: int = 40,
+) -> float:
     """Multiplier on the older group probabilities that equalises burden on the validation month."""
     y, p = valid[config.target].to_numpy(), valid["probability"].to_numpy()
     limit, older = valid["proposed_credit_limit"].to_numpy(), prepare.older(valid)
     low, high = np.log(0.01), 0.0
-    for _ in range(40):
+    for _ in range(steps):
         k = np.exp((low + high) / 2)
-        b = burden(y, older, engine.decide(scaled(p, older, k), limit))
+        b = burden(y, older, engine.decide(scaled(p, older, k), limit, capacity, costs))
         if b["over50"]["good_stopped"] > b["under50"]["good_stopped"]:
             high = np.log(k)
         else:
@@ -64,7 +71,9 @@ def equalising(valid: pd.DataFrame) -> float:
 
 def withage() -> tuple[np.ndarray, dict]:
     """Retrain the shipped model with customer_age added; calibrated test probabilities."""
-    bundle = train.joblib.load(train.modelpath)
+    from vigil.model import train  # training stack only needed here, not by the demo
+
+    bundle = train.joblib.load(config.modelpath)
     cols = bundle["features"] + ["customer_age"]
     fit, valid, test = prepare.split(prepare.load())
     model = train.gbm(fit, valid, cols)
@@ -77,13 +86,14 @@ def withage() -> tuple[np.ndarray, dict]:
 
 
 def main() -> None:
-    test = pd.read_parquet(train.scorespath)
-    valid = pd.read_parquet(train.validpath)
+    test = pd.read_parquet(config.scorespath)
+    valid = pd.read_parquet(config.validpath)
     y, limit = test[config.target].to_numpy(), test["proposed_credit_limit"].to_numpy()
     older = prepare.older(test)
 
     print("retraining with the age feature, for comparison...")
     agep, agepaper = withage()
+    pd.DataFrame({"probability_withage": agep}).to_parquet(withagepath, index=False)
     k = equalising(valid)
     options = {
         "With the age feature": agep,

@@ -1,4 +1,4 @@
-.PHONY: help install data drift model decision explain fairness monitor all api loadtest docker lint format test mlflow clean
+.PHONY: help install data drift model decision explain fairness monitor all api loadtest docker demo-data demo lint format test mlflow clean
 
 help:  ## Show available commands
 	@grep -E "^[a-zA-Z_-]+:.*?## " $(MAKEFILE_LIST) | awk "BEGIN {FS = \":.*?## \"}; {printf \"  \033[36m%-14s\033[0m %s\n\", \$$1, \$$2}"
@@ -38,6 +38,12 @@ loadtest:  ## Latency under load (start make api in another terminal first)
 
 docker:  ## Build the API image (after make model)
 	docker build -t vigil-api .
+
+demo-data:  ## Write the small files the hosted demo needs into app/data
+	uv run python -m vigil.exportdemo
+
+demo:  ## Open the Streamlit demo on http://localhost:8501
+	uv run streamlit run src/vigil/demo.py
 
 lint:  ## Lint with ruff
 	uv run ruff check src tests

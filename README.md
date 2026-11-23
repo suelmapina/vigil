@@ -1,7 +1,10 @@
 # 🛡️ Vigil: Cost-Aware Fraud Screening for Account Opening
 
-> **Work in progress.** Done so far: data, drift analysis, model comparison, cost-based decisions,
-> reason codes, fairness, monitoring and the scoring API. Next: demo.
+> **TL;DR:** On two months the model never saw (205k applications), choosing approve, review or
+> decline by **expected cost** cuts the cost of fraud and screening by **45 %** against a rules
+> engine (**€963k** saved, 95 % CI €887k to €1.05M) with the same analyst team. The model never
+> uses age, is monitored for drift and fairness, and serves each decision with its reasons in
+> about 2 ms of server time (p99 under 20 ms).
 
 ## The business problem
 
@@ -252,6 +255,22 @@ removing both made it about 25 times faster.
 (`requirements-api.txt`, pinned to `uv.lock`; no MLflow or Streamlit), running as a non-root user
 with a health check.
 
+## 7. Interactive demo
+
+`make demo` opens a Streamlit app that recomputes every number on this page live, for any value of
+a good customer, analyst cost and analyst capacity:
+
+- **Policy comparison:** total cost of each policy, how it responds to analyst capacity, where the
+  money goes, and how the decision changes with the credit line requested.
+- **Application review:** 300 real test applications, each with the expected cost of every action
+  and the reasons behind its score, as an analyst would see them.
+- **Drift and monitoring:** fraud rate and input drift by month, the monthly report with its
+  alerts, the retraining backtest and the shadow test.
+- **Fairness:** the three options priced live.
+
+It runs from small files in `app/data` (`make demo-data`), so it needs neither the dataset nor the
+training stack.
+
 ## Quickstart
 
 ```bash
@@ -259,6 +278,7 @@ make install       # uv sync, Python 3.11
 make data          # BAF base from Kaggle (needs a Kaggle API token in ~/.kaggle)
 make all           # drift, models, decisions, reasons, fairness, monitoring (~16 min)
 make test          # unit tests
+make demo          # interactive demo on http://localhost:8501
 make api           # scoring API on http://localhost:8000/docs
 make mlflow        # experiment tracking UI
 ```

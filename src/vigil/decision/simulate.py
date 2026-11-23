@@ -16,13 +16,12 @@ import pandas as pd
 from vigil import config
 from vigil.decision import engine
 from vigil.model import metrics
-from vigil.model.train import scorespath, validpath
 
 modelscore = "score_lightgbm_stable"
 
 
 def load() -> tuple[pd.DataFrame, pd.DataFrame]:
-    return pd.read_parquet(scorespath), pd.read_parquet(validpath)
+    return pd.read_parquet(config.scorespath), pd.read_parquet(config.validpath)
 
 
 def topshare(score: np.ndarray, share: float) -> np.ndarray:
