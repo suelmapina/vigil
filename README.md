@@ -2,6 +2,8 @@
 
 [![ci](https://github.com/suelmapina/vigil/actions/workflows/ci.yml/badge.svg)](https://github.com/suelmapina/vigil/actions/workflows/ci.yml)
 
+**[▶ Live demo](https://vigil-suelmapina.streamlit.app/)** · change the costs and see every number recomputed
+
 > **TL;DR:** On two months the model never saw (205k applications), choosing approve, review or
 > decline by **expected cost** cuts the cost of fraud and screening by **45 %** against a rules
 > engine (**€963k** saved, 95 % CI €887k to €1.05M) with the same analyst team. The model never
@@ -266,7 +268,7 @@ with a health check.
 
 ## 7. Interactive demo
 
-`make demo` opens a Streamlit app that recomputes every number on this page live, for any value of
+The [live demo](https://vigil-suelmapina.streamlit.app/) (or `make demo` locally) is a Streamlit app that recomputes every number on this page live, for any value of
 a good customer, analyst cost and analyst capacity:
 
 - **Policy comparison:** total cost of each policy, how it responds to analyst capacity, where the
