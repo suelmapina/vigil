@@ -47,7 +47,7 @@ st.markdown(
   color: {theme.light}; }}
 .chip.alert {{ border-color: rgba(140, 71, 209, 0.6); background: rgba(140, 71, 209, 0.14); }}
 .assumptions {{ font-family: '{theme.mono}', monospace; font-size: 0.68rem; letter-spacing: 0.1em;
-  text-transform: uppercase; color: {theme.mutedforeground}; margin-bottom: 0.2rem; }}
+  text-transform: uppercase; color: {theme.mutedforeground}; margin: 1.6rem 0 0.2rem; }}
 .stTabs [data-baseweb="tab-highlight"] {{ height: 2px; }}
 .report {{ display: grid; grid-template-columns: 0.8fr 3.2fr repeat(5, 1fr);
   gap: 0.55rem 1.2rem; align-items: center; color: {theme.light}; font-size: 0.92rem; }}
