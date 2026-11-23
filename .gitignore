@@ -1,0 +1,27 @@
+# environment
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# data is downloaded, never committed (see `make data`)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# experiment tracking & artefacts
+mlruns/
+mlflow.db
+mlartifacts/
+models/*
+!models/.gitkeep
+
+# OS / editor
+.DS_Store
+*:Zone.Identifier
+.vscode/
+.idea/
+.env
