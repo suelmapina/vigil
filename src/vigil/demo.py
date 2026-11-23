@@ -46,6 +46,8 @@ st.markdown(
   margin: 0 0.3rem 0.3rem 0; border-radius: 6px; border: 1px solid {theme.border};
   color: {theme.light}; }}
 .chip.alert {{ border-color: rgba(140, 71, 209, 0.6); background: rgba(140, 71, 209, 0.14); }}
+.assumptions {{ color: {theme.mutedforeground}; font-size: 0.9rem; }}
+.stTabs [data-baseweb="tab-highlight"] {{ height: 2px; }}
 .report {{ display: grid; grid-template-columns: 0.8fr 3.2fr repeat(5, 1fr);
   gap: 0.55rem 1.2rem; align-items: center; color: {theme.light}; font-size: 0.92rem; }}
 .report .chip {{ margin-bottom: 0.15rem; }}
@@ -201,27 +203,22 @@ frauds = int(test[config.target].sum())
 html(
     '<div class="eyebrow">Vigil · fraud screening case study</div>'
     '<div class="headline">Approve, review or decline?</div>'
-    '<div class="lede">Every online account application needs a decision in seconds. Missing a '
-    "fraudster costs the credit line; stopping a genuine customer costs analyst time, and often "
-    "the customer. Vigil scores the fraud risk, then takes the action with the lowest "
-    "<i>expected cost</i>, within the analyst capacity the team actually has.</div>"
-    '<div class="formula">cheapest of · <b>approve</b> p × credit line · '
-    "<b>review</b> analyst time + fraud the analyst misses · "
-    "<b>decline</b> (1 − p) × value of a good customer</div>"
+    '<div class="lede">For every new account application, Vigil takes the action that is '
+    "expected to cost the least: fraud let through, analyst time, or a good customer lost.</div>"
 )
 st.write("")
 
-with st.container(border=True):
-    c1, c2, c3 = st.columns(3, gap="large")
-    lost = c1.select_slider(
+bar = st.columns([4, 1], vertical_alignment="center")
+with bar[1].popover("Adjust assumptions", icon=":material/tune:", width="stretch"):
+    lost = st.select_slider(
         "Value of a good customer turned away (€)",
         [25, 50, 100, 200, 400],
         value=100,
         help="Lifetime margin lost when a legitimate applicant is declined.",
     )
-    reviewcost = c2.slider("Analyst cost per review (€)", 5, 50, 20, 5)
+    reviewcost = st.slider("Analyst cost per review (€)", 5, 50, 20, 5)
     capacity = (
-        c3.select_slider(
+        st.select_slider(
             "Analyst capacity, share of applications",
             [0.5, 1.0, 2.5, 5.0, 10.0],
             value=2.5,
@@ -231,53 +228,51 @@ with st.container(border=True):
         / 100
     )
 costs = {"lostcustomer": float(lost), "reviewcost": float(reviewcost)}
+bar[0].markdown(
+    '<div class="assumptions">Two months the model never saw · 205,011 applications · '
+    f"good customer worth €{lost} · €{reviewcost} per review · analysts review "
+    f"{capacity:.1%}</div>".replace(".0%", "%"),
+    unsafe_allow_html=True,
+)
 
 with st.spinner("Scoring 205,011 applications under every policy…"):
     table = comparison(float(lost), float(reviewcost), capacity)
 best = table.loc[ours]
 rules = table.loc[display["Rules: review top alerts"]]
-everyone = table.loc["Approve everyone"]
 saved = rules["vs_vigil"]
 
-st.write("")
-k1, k2, k3, k4 = st.columns(4)
-k1.markdown(
-    kpi(
-        "Cost of fraud and screening",
-        money(best["cost"]),
-        "two unseen months · 205k applications",
-        accent=True,
-        highlight=True,
-    ),
-    unsafe_allow_html=True,
-)
-k2.markdown(
-    kpi(
-        "Saved vs rules engine",
-        money(saved),
-        f"−{saved / rules['cost']:.0%} · 95% CI {money(rules['vs_vigil_low'])} to "
-        f"{money(rules['vs_vigil_high'])}, same analysts",
-    ),
-    unsafe_allow_html=True,
-)
-k3.markdown(
-    kpi(
-        "Fraud stopped",
-        f"{best['fraud_stopped']:.0%}",
-        f"of {frauds:,} frauds · {money(everyone['fraud_loss'] - best['fraud_loss'])} of losses "
-        "prevented",
-    ),
-    unsafe_allow_html=True,
-)
 legit = len(test) - frauds
-k4.markdown(
-    kpi(
-        "Good customers declined",
-        f"{int(best['good_declined']):,}",
-        f"{best['good_declined'] / legit:.2%} of genuine · {int(best['reviews']):,} reviewed",
-    ),
-    unsafe_allow_html=True,
-)
+st.write("")
+kpis = st.container()
+with kpis:
+    k1, k2, k3, k4 = st.columns(4)
+    k1.markdown(
+        kpi(
+            "Saved vs rules engine",
+            money(saved),
+            f"{saved / rules['cost']:.0%} less, same analysts",
+            accent=True,
+            highlight=True,
+        ),
+        unsafe_allow_html=True,
+    )
+    k2.markdown(
+        kpi("Total cost", money(best["cost"]), "fraud, analysts and lost customers"),
+        unsafe_allow_html=True,
+    )
+    k3.markdown(
+        kpi("Fraud stopped", f"{best['fraud_stopped']:.0%}", f"of {frauds:,} frauds"),
+        unsafe_allow_html=True,
+    )
+    k4.markdown(
+        kpi(
+            "Good customers declined",
+            f"{int(best['good_declined']):,}",
+            f"{best['good_declined'] / legit:.2%} of genuine applicants",
+        ),
+        unsafe_allow_html=True,
+    )
+st.write("")
 st.write("")
 
 policytab, reviewtab, drifttab, fairtab, methodtab = st.tabs(
@@ -304,7 +299,12 @@ with policytab:
         )
         chart = (
             base.mark_bar(height=20, cornerRadiusEnd=4).encode(
-                x=alt.X("cost:Q", title=None, axis=alt.Axis(labelExpr=eurolabels, tickCount=5)),
+                x=alt.X(
+                    "cost:Q",
+                    title=None,
+                    scale=alt.Scale(domain=[0, bars["cost"].max() * 1.18]),
+                    axis=alt.Axis(labelExpr=eurolabels, tickCount=5),
+                ),
                 color=alt.condition(
                     "datum.ours", alt.value(theme.primary), alt.value(theme.context)
                 ),
@@ -940,6 +940,11 @@ with methodtab:
     m = proof["model"]
     boot = m["bootstrap_vs_logistic"]["lightgbm_stable"]["recall_at_5fpr"]
     lat = proof["latency"]
+    html(
+        '<div class="formula" style="margin:0 0 0.9rem 0">cheapest of · <b>approve</b> '
+        "p × credit line · <b>review</b> analyst time + fraud the analyst misses · "
+        "<b>decline</b> (1 − p) × value of a good customer</div>"
+    )
     html(
         '<div class="split"><div class="fit">Fit · months 0 to 4 · 676k applications</div>'
         '<div class="tune">Tune · month 5</div>'

@@ -27,8 +27,8 @@ def test_demo_reacts_to_costs():
 
     app = AppTest.from_file(str(config.root / "src" / "vigil" / "demo.py"), default_timeout=180)
     app.run()
-    before = [m.value for m in app.markdown if "Cost of fraud and screening" in m.value][0]
+    before = [m.value for m in app.markdown if "Total cost" in m.value][0]
     app.select_slider[0].set_value(400).run()
     assert not app.exception, app.exception
-    after = [m.value for m in app.markdown if "Cost of fraud and screening" in m.value][0]
+    after = [m.value for m in app.markdown if "Total cost" in m.value][0]
     assert before != after
